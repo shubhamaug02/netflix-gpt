@@ -1,6 +1,11 @@
 import React,{useState, useRef} from 'react'
 import Header from './Header'
 import {checkValidData, checkValidDataWithName} from '../utils/validate'
+import {auth} from '../utils/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+import {useDispatch} from 'react-redux';
+import {addUser} from '../utils/userSlice';
 
 const Login = () => {
 
@@ -10,6 +15,8 @@ const Login = () => {
     const name = useRef(null);
     const email = useRef(null);
     const password = useRef(null);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleButtonClick = () => {
         // Validate form data
@@ -23,6 +30,49 @@ const Login = () => {
 
         //console.log(errorMessage);
         setErrorMessage(message);
+
+        if(message) return;
+        if(!isSignInForm){
+            //Sign Up logic
+            createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+                .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                updateProfile(user, {
+                    displayName: name.current.value, 
+                    photoURL: "https://avatars.githubusercontent.com/u/13162724?v=4"
+                  }).then(() => {
+                    const {uid, email, displayName, photoURL} = auth.currentUser;
+                    dispatch(addUser({uid, email, displayName, photoURL}));
+                  }).catch((error) => {
+                    // An error occurred
+                    // ...
+                  });
+                navigate("/browse");
+                console.log(user);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                setErrorMessage(errorMessage + "-" + errorCode);
+            });
+
+        }
+        else {
+            //SignIn logic
+            signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    navigate("/browse");
+                    console.log(user);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    setErrorMessage(errorMessage + "-" + errorCode);
+                });
+            }
     }
 
     const toggleSignInForm = () => {
