@@ -38,8 +38,15 @@
 - usePopularMovies Custom hook
 - GPT Search Page
 - GPT Search Bar
-- Multi-language Feature in our App 
-
+- Multi-language Feature in our App
+- OpenAI GPT Key
+- GPT Query for 5 movies
+- TMDB Movies API with GPT query Response
+- Added the Movies Data to Redux Store
+- Reused the MovieList to show the movies fetched using GPT Query and tmdb
+- Memoization
+- Added the OpenAI and tmdb token key to the .env file
+- Make the site responsive 
 
 # Features
 - Login/Sign Up
